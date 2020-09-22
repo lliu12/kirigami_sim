@@ -6,6 +6,22 @@ import pymunk as pm
 from pymunk import Vec2d
 import pymunk.pygame_util
 
+# define constants
+
+# read in files
+
+# define helper functions
+
+# run game def main: can be in another module I think
+    # setting up the bodies, etc
+    # make a separate file for event handling tho
+
+
+# wrapper class that stores space, static pins, tile vertices, tile centers, constraints, pattern_center
+# center_bodies, center_shapes, vertex_bodies, vertex_shapes, spring_anchor_coords for auto expand
+# bools like is interactive, auto expand, fourier, etc. put these in a params dict?
+
+
 # constants
 # offsets + scaling constant to help get vertices centered in the display screen
 X_OFFSET =250
@@ -31,11 +47,11 @@ RIGHT = 3
 # vertices_file = open("info_files/penrose_star1121122_vertices.txt")
 # constraints_file = open("info_files/penrose_star1121122_constraints1.txt")
 
-vertices_file = open("info_files/penrose110_nothinrhombs_vertices.txt")
-constraints_file = open("info_files/penrose110_nothinrhombs_constraints1.txt")
+# vertices_file = open("info_files/penrose110_fifth_vertices.txt")
+# constraints_file = open("info_files/penrose110_fifth_constraints_dp.txt")
 
-# vertices_file = open("info_files/ammannbeenker40_vertices.txt")
-# constraints_file = open("info_files/ammannbeenker40_constraints1.txt")
+vertices_file = open("info_files/ammannbeenker40_vertices.txt")
+constraints_file = open("info_files/ammannbeenker40_constraints2.txt")
 
 # vertices_file = open("info_files/stampfli132_nothinrhombs_vertices.txt")
 # constraints_file = open("info_files/stampfli132_nothinrhombs_constraints1.txt")
@@ -50,7 +66,7 @@ constraints_file = open("info_files/penrose110_nothinrhombs_constraints1.txt")
 if CALCULATE_AREA or AUTO_EXPAND:
     # each row is a hull vertex, where the first num. is tile # and second num. is vertex #
     # hull_file = open("penrose1_hull.txt")
-    hull_file = open("info_files/penrose110_nothinrhombs_hull1.txt")
+    hull_file = open("info_files/ammannbeenker40_hull2.txt")
 
 
 # read vertices into tile_vertices
@@ -249,18 +265,11 @@ def main():
                 save_vertices_file = open("kirigami_simulation_vertices" + temp_time + ".txt", "x")
                 print("Saved file of current vertices to " + "kirigami_simulation_vertices" + temp_time + ".txt")
                 current_vertices = []
-                for t in vertex_bodies:
-                    # vertices = map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
-                    #                                         height - (x.rotated(center.body.angle) + center.body.position)[1]),
-                    #                                                 center.get_vertices())
-                    vertices = []
-                    # for body in t:
-                    #     vertices.append(body.positon.x)
-                    #     vertices.append(height - body.position.y)
-                    # for pos in vertices:
-                    #     save_vertices_file.write(str(round((pos[0] - X_OFFSET) / VERTEX_MULTIPLIER, 3)) + " " + str(round(((pos[1] - Y_OFFSET) / VERTEX_MULTIPLIER), 3)) + " ")
-                    for body in t:
-                        pos = (body.position.x, height - body.position.y)
+                for center in center_shapes:
+                    vertices = map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
+                                                            height - (x.rotated(center.body.angle) + center.body.position)[1]),
+                                                                    center.get_vertices())
+                    for pos in vertices:
                         save_vertices_file.write(str(round((pos[0] - X_OFFSET) / VERTEX_MULTIPLIER, 3)) + " " + str(round(((pos[1] - Y_OFFSET) / VERTEX_MULTIPLIER), 3)) + " ")
                     save_vertices_file.write("\n")
                 save_vertices_file.close()
