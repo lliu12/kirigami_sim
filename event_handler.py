@@ -1,3 +1,5 @@
+# handle user events
+
 import sys, random, datetime, os, statistics, math
 import pygame
 from pygame.locals import *

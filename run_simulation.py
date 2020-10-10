@@ -1,3 +1,5 @@
+# read inputs, run simulation
+
 import sys, random, datetime, os, statistics, math
 import pygame
 from pygame.locals import *
@@ -16,7 +18,7 @@ VERTEX_MULTIPLIER = 1
 DISPLAY_SIZE = (800,800)
 IS_INTERACTIVE = True
 # use a given hull file to calculate and display the area of the pattern
-CALCULATE_AREA_PERIM = True
+CALCULATE_AREA_PERIM = False
 # only display the vertices of shapes (so screenshots can be used for fourier transform)
 FOURIER = False
 # automatically apply force with this magnitude outwards on pattern
@@ -26,11 +28,11 @@ spring_damping = 1000
 
 
 # files
-vertices_file = open("info_files/ammannbeenker40_vertices.txt")
-constraints_file = open("info_files/ammannbeenker40_constraints2.txt")
+vertices_file = open("info_files/ammannbeenker40_nosquares_vertices.txt")
+constraints_file = open("info_files/ammannbeenker40_nosquares_constraints1.txt")
 
 if CALCULATE_AREA_PERIM or AUTO_EXPAND:
-    hull_file = open("info_files/ammannbeenker40_hull2.txt")
+    hull_file = open("info_files/ammannbeenker72_nosquares_hull2.txt")
 else:
     hull_file = None
 
@@ -101,7 +103,6 @@ def main():
     screen = pygame.display.set_mode(DISPLAY_SIZE, 0) 
     _, height = screen.get_size()
     max_scr = 1
-        
     clock = pygame.time.Clock()
     running = True
     font = pygame.font.Font(None, 16)
@@ -152,18 +153,8 @@ def main():
             if current_scr > max_scr:
                 max_scr = current_scr
             screen.blit(font.render("Max SCR Observed: " + str(max_scr), 1, THECOLORS["darkgrey"]), (5,30))
-            ## unnecessary - hull perimeter does not change during deployment
-            # perimeter = 0
-            # for i in range(len(hull_vertices)):
-            #     v1 = sim.hull_vertices[i]
-            #     v2 = sim.hull_vertices[(i + 1) % len(hull_vertices)]
-            #     pos1 = sim.vertex_bodies[(v1[0])][(v1[1])].position
-            #     pos2 = sim.vertex_bodies[(v2[0])][(v2[1])].position
-            #     perimeter += np.linalg.norm(np.array(pos1) - np.array(pos2))
             screen.blit(font.render("Hull Perimeter: " + str(perimeter), 1, THECOLORS["darkgrey"]), (5,45))
 
-
-            
         pygame.display.flip()
         clock.tick(fps)
         

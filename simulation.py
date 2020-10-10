@@ -1,3 +1,5 @@
+# simulate tile locations
+
 import sys, random, datetime, os, statistics, math
 import pygame
 from pygame.locals import *
