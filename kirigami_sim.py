@@ -5,6 +5,7 @@ from pygame.color import *
 import pymunk as pm
 from pymunk import Vec2d
 import pymunk.pygame_util
+import numpy as np
 
 # constants
 # offsets + scaling constant to help get vertices centered in the display screen
@@ -19,7 +20,7 @@ CALCULATE_AREA = True
 # only display the vertices of shapes (so screenshots can be used for fourier transform)
 FOURIER = False
 # automatically apply force with this magnitude outwards on pattern
-AUTO_EXPAND = True
+AUTO_EXPAND = False
 spring_stiffness = 80
 spring_damping = 1000
 # mouse event button info
@@ -31,14 +32,14 @@ RIGHT = 3
 # vertices_file = open("info_files/penrose_star1121122_vertices.txt")
 # constraints_file = open("info_files/penrose_star1121122_constraints1.txt")
 
-vertices_file = open("info_files/penrose110_nothinrhombs_vertices.txt")
-constraints_file = open("info_files/penrose110_nothinrhombs_constraints1.txt")
+# vertices_file = open("info_files/penrose60_vertices.txt")
+# constraints_file = open("info_files/penrose60_constraints1.txt")
 
 # vertices_file = open("info_files/ammannbeenker40_vertices.txt")
 # constraints_file = open("info_files/ammannbeenker40_constraints1.txt")
 
-# vertices_file = open("info_files/stampfli132_nothinrhombs_vertices.txt")
-# constraints_file = open("info_files/stampfli132_nothinrhombs_constraints1.txt")
+vertices_file = open("info_files/stampfli132_nothinrhombs_vertices.txt")
+constraints_file = open("info_files/stampfli132_nothinrhombs_constraints1.txt")
 
 # vertices_file = open("info_files/grid_unit_vertices.txt")
 # constraints_file = open("info_files/grid_unit_constraints.txt")
@@ -50,7 +51,7 @@ constraints_file = open("info_files/penrose110_nothinrhombs_constraints1.txt")
 if CALCULATE_AREA or AUTO_EXPAND:
     # each row is a hull vertex, where the first num. is tile # and second num. is vertex #
     # hull_file = open("penrose1_hull.txt")
-    hull_file = open("info_files/penrose110_nothinrhombs_hull1.txt")
+    hull_file = open("info_files/stampfli132_nothinrhombs_hull1.txt")
 
 
 # read vertices into tile_vertices
@@ -58,15 +59,18 @@ if CALCULATE_AREA or AUTO_EXPAND:
 tile_vertices = []
 for l in (vertices_file.read().splitlines()):
     line = l.split()
-    tile_vertices.append([(float(line[i-1]) * VERTEX_MULTIPLIER + X_OFFSET, float(line[i]) * VERTEX_MULTIPLIER + Y_OFFSET) 
+    tile_vertices.append([[float(line[i-1]) * VERTEX_MULTIPLIER + X_OFFSET, float(line[i]) * VERTEX_MULTIPLIER + Y_OFFSET]
                           for i in range(len(line)) if i % 2 == 1])
+tile_vertices = np.array(tile_vertices)
 
 # calculate tile centers by averaging x and y coords of vertices
 # return the center of a single tile given a list of its vertices
 def get_center(t):
-    length = len(t)
-    unzipped = list(zip(*t))
-    return (sum(unzipped[0])/length, sum(unzipped[1])/length)
+    tt = np.array(t)
+    x_av = np.mean(tt[:,0])
+    y_av = np.mean(tt[:,1])
+    return (x_av, y_av)
+
 tile_centers = [get_center(t) for t in tile_vertices]
 
 # calculate the center of the whole pattern by averaging x and y coords of tile centers
@@ -99,7 +103,8 @@ def reset_bodies(space, static_pins):
     #         space.remove(constraint)
     for s in static_pins:
         space.remove(s)
-    static_pins.clear()
+    # static_pins.clear()
+    del static_pins[:]
     color = THECOLORS["lightskyblue1"]
     for shape in space.shapes:
         shape.color = color
@@ -118,6 +123,8 @@ if CALCULATE_AREA:
         hull_vertices.append([int(line[0]) - 1, int(line[1]) - 1])
     hull_file.close()
     initial_hull_area = area([tile_vertices[(v[0])][(v[1])] for v in hull_vertices])
+else:
+    hull_vertices = None
 
 # run game
 def main():
@@ -370,7 +377,7 @@ def main():
 
         # Update physics
         fps = 25
-        iterations = 20
+        iterations = 25
         dt = 1.0/float(fps)/float(iterations)
         for _ in range(iterations): # 10 iterations to get a more stable simulation
             space.step(dt)
