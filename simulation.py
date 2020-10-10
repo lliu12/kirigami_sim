@@ -72,7 +72,7 @@ class Simulation(object):
             self.space.add(pin)
 
         
-        if self.params['AUTO_EXPAND'] or self.params['CALCULATE_AREA']:
+        if self.params['AUTO_EXPAND'] or self.params['CALCULATE_AREA_PERIM']:
             # this code adds a spring for every tile center of tiles in the hull
             self.hull_tiles = list(zip(*(self.hull_vertices)))[0]
 
@@ -128,7 +128,7 @@ class Simulation(object):
                                     list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
                                                         self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
                                                                 center.get_vertices())), 1)
-                if self.params["CALCULATE_AREA"]:
+                if self.params["CALCULATE_AREA_PERIM"]:
                     pygame.draw.polygon(self.screen, 
                                         THECOLORS["lightskyblue3"], 
                                         list(map(lambda x: self.to_pygame(x),

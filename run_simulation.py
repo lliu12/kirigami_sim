@@ -16,11 +16,11 @@ VERTEX_MULTIPLIER = 1
 DISPLAY_SIZE = (800,800)
 IS_INTERACTIVE = True
 # use a given hull file to calculate and display the area of the pattern
-CALCULATE_AREA = True
+CALCULATE_AREA_PERIM = True
 # only display the vertices of shapes (so screenshots can be used for fourier transform)
 FOURIER = False
 # automatically apply force with this magnitude outwards on pattern
-AUTO_EXPAND = True
+AUTO_EXPAND = False
 spring_stiffness = 80
 spring_damping = 1000
 
@@ -29,7 +29,7 @@ spring_damping = 1000
 vertices_file = open("info_files/ammannbeenker40_vertices.txt")
 constraints_file = open("info_files/ammannbeenker40_constraints2.txt")
 
-if CALCULATE_AREA or AUTO_EXPAND:
+if CALCULATE_AREA_PERIM or AUTO_EXPAND:
     hull_file = open("info_files/ammannbeenker40_hull2.txt")
 else:
     hull_file = None
@@ -71,15 +71,27 @@ def segments(v):
     return zip(v, v[1:] + [v[0]])
 
 def area(v):
-    return 0.5 * abs(sum(x0*y1 - x1*y0 for ((x0, y0), (x1, y1)) in segments(v)))
+    return 0.5 * abs(np.sum([x0*y1 - x1*y0 for ((x0, y0), (x1, y1)) in segments(v)]))
 
-if CALCULATE_AREA:
+if CALCULATE_AREA_PERIM:
     hull_vertices = []
     for l in (hull_file.read().splitlines()):
         line = l.split()
         hull_vertices.append([int(line[0]) - 1, int(line[1]) - 1])
     hull_file.close()
     initial_hull_area = area([tile_vertices[(v[0])][(v[1])] for v in hull_vertices])
+
+    perimeter = 0
+    for i in range(len(hull_vertices)):
+        v1 = hull_vertices[i]
+        v2 = hull_vertices[(i + 1) % len(hull_vertices)]
+        pos1 = tile_vertices[(v1[0])][(v1[1])]
+        pos2 = tile_vertices[(v2[0])][(v2[1])]
+        perimeter += np.linalg.norm(np.array(pos1) - np.array(pos2))
+
+    
+    # for i in range(len(hull_vertices)):
+    #     perimeter += np.linalg.norm(np.array(hull_vertices[i]) - np.array(hull_vertices[(i + 1) % len(hull_vertices)]))
 else:
     hull_vertices = None
 
@@ -100,7 +112,7 @@ def main():
         "VERTEX_MULTIPLIER": VERTEX_MULTIPLIER,
         "DISPLAY_SIZE": DISPLAY_SIZE,
         "IS_INTERACTIVE": IS_INTERACTIVE,
-        "CALCULATE_AREA": CALCULATE_AREA,
+        "CALCULATE_AREA_PERIM": CALCULATE_AREA_PERIM,
         "FOURIER": FOURIER,
         "AUTO_EXPAND": AUTO_EXPAND,
         "SPRING_STIFFNESS": spring_stiffness,
@@ -133,13 +145,24 @@ def main():
             screen.blit(font.render("Press R to reset", 1, THECOLORS["darkgrey"]), (5,height - 35))
             screen.blit(font.render("Press P to save screen image", 1, THECOLORS["darkgrey"]), (5,height - 20))
         
-        if CALCULATE_AREA: 
+        if CALCULATE_AREA_PERIM: 
             current_hull_area = area([sim.vertex_bodies[(v[0])][(v[1])].position for v in sim.hull_vertices])
             current_scr = (round(current_hull_area / initial_hull_area, 4))
             screen.blit(font.render("SCR (Current Area / Contracted Area) : " + str(current_scr), 1, THECOLORS["darkgrey"]), (5,15))
             if current_scr > max_scr:
                 max_scr = current_scr
             screen.blit(font.render("Max SCR Observed: " + str(max_scr), 1, THECOLORS["darkgrey"]), (5,30))
+            ## unnecessary - hull perimeter does not change during deployment
+            # perimeter = 0
+            # for i in range(len(hull_vertices)):
+            #     v1 = sim.hull_vertices[i]
+            #     v2 = sim.hull_vertices[(i + 1) % len(hull_vertices)]
+            #     pos1 = sim.vertex_bodies[(v1[0])][(v1[1])].position
+            #     pos2 = sim.vertex_bodies[(v2[0])][(v2[1])].position
+            #     perimeter += np.linalg.norm(np.array(pos1) - np.array(pos2))
+            screen.blit(font.render("Hull Perimeter: " + str(perimeter), 1, THECOLORS["darkgrey"]), (5,45))
+
+
             
         pygame.display.flip()
         clock.tick(fps)
