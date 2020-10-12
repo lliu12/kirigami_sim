@@ -12,9 +12,9 @@ from simulation import Simulation
 
 # constants
 # offsets + scaling constant to help get vertices centered in the display screen
-X_OFFSET = 0
-Y_OFFSET = 0
-VERTEX_MULTIPLIER = 3
+X_OFFSET = 100
+Y_OFFSET = 100
+VERTEX_MULTIPLIER = 1
 DISPLAY_SIZE = (800,800)
 IS_INTERACTIVE = True
 # use a given hull file to calculate and display the area of the pattern
@@ -28,13 +28,13 @@ spring_damping = 1000
 
 
 # files
-vertices_file = open("info_files/stampfli_star2325_vertices.txt")
-constraints_file = open("info_files/stampfli_star2325_constraints1.txt")
+vertices_file = open("info_files/ammannbeenker112_nosquares_vertices.txt")
+constraints_file = open("info_files/ammannbeenker112_nosquares_constraints1.txt")
 
 
 if CALCULATE_AREA_PERIM or AUTO_EXPAND:
     hull_file = None
-    hull_file = open("info_files/stampfli_star2325_hull1.txt")
+    hull_file = open("info_files/ammannbeenker112_nosquares_hull1.txt")
 
 # read vertices into tile_vertices
 # ith row of vertices file should hold coordinates for the ith tile's vertices, in the form x1 y1 x2 y2 ... 
