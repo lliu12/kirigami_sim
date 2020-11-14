@@ -23,7 +23,7 @@ CALCULATE_AREA_PERIM = True
 FOURIER = False
 # automatically apply force with this magnitude outwards on pattern
 AUTO_EXPAND = True
-spring_stiffness = 60
+spring_stiffness = 80
 spring_damping = 1000
 
 
@@ -75,7 +75,7 @@ def segments(v):
 def area(v):
     return 0.5 * abs(np.sum([x0*y1 - x1*y0 for ((x0, y0), (x1, y1)) in segments(v)]))
 
-if CALCULATE_AREA_PERIM:
+if CALCULATE_AREA_PERIM or AUTO_EXPAND:
     hull_vertices = []
     for l in (hull_file.read().splitlines()):
         line = l.split()
