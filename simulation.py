@@ -22,6 +22,7 @@ class Simulation(object):
         self.pattern_center = pattern_center
         self.selected = None
         self.static_pins = []
+        self.max_scr = 1
         self.reset()
 
         self.handler = EventHandler(self)
@@ -105,6 +106,7 @@ class Simulation(object):
         color = THECOLORS["lightskyblue1"]
         for shape in self.space.shapes:
             shape.color = color
+        self.max_scr = 1
 
 
     # maybe need to move this to a drawer class that takes simulation and also screen

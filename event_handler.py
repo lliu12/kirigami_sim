@@ -52,6 +52,7 @@ class EventHandler():
             print("Saved file of current vertices to " + "kirigami_simulation_vertices" + temp_time + ".txt")
             current_vertices = []
             for center in self.sim.center_shapes:
+                # THE "self.sim_height - " FLIPS THE VERTICES UPSIDE DOWN
                 vertices = map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
                                                         self.sim.height - (x.rotated(center.body.angle) + center.body.position)[1]),
                                                                 center.get_vertices())
@@ -59,7 +60,7 @@ class EventHandler():
                     save_vertices_file.write(str(round((pos[0] - self.sim.params["X_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"], 3)) + " " + str(round(((pos[1] - self.sim.params["Y_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"]), 3)) + " ")
                 save_vertices_file.write("\n")
             save_vertices_file.close()
-            
+
         elif event.type == MOUSEBUTTONDOWN and self.sim.params["IS_INTERACTIVE"] and event.button == LEFT:
             if self.sim.selected != None:
                 self.sim.space.remove(self.sim.selected)

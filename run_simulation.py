@@ -12,9 +12,9 @@ from simulation import Simulation
 
 # constants
 # offsets + scaling constant to help get vertices centered in the display screen
-X_OFFSET = 100
-Y_OFFSET = 100
-VERTEX_MULTIPLIER = 1
+X_OFFSET = 150
+Y_OFFSET = 150
+VERTEX_MULTIPLIER = .6
 DISPLAY_SIZE = (800,800)
 IS_INTERACTIVE = True
 # use a given hull file to calculate and display the area of the pattern
@@ -23,18 +23,18 @@ CALCULATE_AREA_PERIM = True
 FOURIER = False
 # automatically apply force with this magnitude outwards on pattern
 AUTO_EXPAND = True
-spring_stiffness = 15
+spring_stiffness = 60
 spring_damping = 1000
 
 
 # files
-vertices_file = open("info_files/ammannbeenker112_nosquares_vertices.txt")
-constraints_file = open("info_files/ammannbeenker112_nosquares_constraints1.txt")
+vertices_file = open("info_files/penrose110_vertices.txt")
+constraints_file = open("info_files/penrose110_constraints1.txt")
 
 
 if CALCULATE_AREA_PERIM or AUTO_EXPAND:
     hull_file = None
-    hull_file = open("info_files/ammannbeenker112_nosquares_hull1.txt")
+    hull_file = open("info_files/penrose110_hull1.txt")
 
 # read vertices into tile_vertices
 # ith row of vertices file should hold coordinates for the ith tile's vertices, in the form x1 y1 x2 y2 ... 
@@ -102,7 +102,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(DISPLAY_SIZE, 0) 
     _, height = screen.get_size()
-    max_scr = 1
+    # max_scr = 1
     clock = pygame.time.Clock()
     running = True
     font = pygame.font.Font(None, 16)
@@ -150,9 +150,9 @@ def main():
             current_hull_area = area([sim.vertex_bodies[(v[0])][(v[1])].position for v in sim.hull_vertices])
             current_scr = (round(current_hull_area / initial_hull_area, 4))
             screen.blit(font.render("SCR (Current Area / Contracted Area) : " + str(current_scr), 1, THECOLORS["darkgrey"]), (5,15))
-            if current_scr > max_scr:
-                max_scr = current_scr
-            screen.blit(font.render("Max SCR Observed: " + str(max_scr), 1, THECOLORS["darkgrey"]), (5,30))
+            if current_scr > sim.max_scr:
+                sim.max_scr = current_scr
+            screen.blit(font.render("Max SCR Observed: " + str(sim.max_scr), 1, THECOLORS["darkgrey"]), (5,30))
             screen.blit(font.render("Hull Perimeter: " + str(perimeter), 1, THECOLORS["darkgrey"]), (5,45))
 
         pygame.display.flip()
