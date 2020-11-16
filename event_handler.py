@@ -64,9 +64,19 @@ class EventHandler():
                 v_list = list(vertices)
                 for v in range(len(v_list)):
                     pos = v_list[-v]
-                    save_vertices_file.write(str(round((pos[0] - self.sim.params["X_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"], 3)) + " " + str(round(((pos[1] - self.sim.params["Y_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"]), 3)) + " ")
+                    save_vertices_file.write(str(round((pos[0] - self.sim.params["X_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"], 3)) + " " + str(round((pos[1] - self.sim.params["Y_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"], 3)) + " ")
                 save_vertices_file.write("\n")
             save_vertices_file.close()
+
+        # press c to save a file of current locations of tile centers
+        elif event.type == KEYDOWN and event.key == K_c and self.sim.params["IS_INTERACTIVE"]:
+            temp_time = str("{date:%Y%m%d_%H%M%S}".format(date=datetime.datetime.now()))
+            save_centers_file = open("kirigami_simulation_centers" + temp_time + ".txt", "x")
+            print("Saved file of current tile centers to " + "kirigami_simulation_centers" + temp_time + ".txt")
+            current_centers = []
+            for center in self.sim.center_shapes:
+                save_centers_file.write(str(round((center.body.position[0] - self.sim.params["X_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"], 3)) + " " + str(round((center.body.position[1] - self.sim.params["Y_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"], 3)) + "\n")
+            save_centers_file.close()
 
         elif event.type == MOUSEBUTTONDOWN and self.sim.params["IS_INTERACTIVE"] and event.button == LEFT:
             if self.sim.selected != None:
