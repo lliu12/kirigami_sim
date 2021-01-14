@@ -10,10 +10,11 @@ import pymunk.pygame_util
 from event_handler import EventHandler
 
 class Simulation(object):
-    def __init__(self, tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen, damping = .6):
+    def __init__(self, tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen, damping = .6, iterations = 20, add_rotary_springs = False):
         self.params = params
         self.space = pm.Space()
         self.space.damping = damping
+        self.space.iterations = iterations
         self.mouse = pm.Body(body_type=pm.Body.KINEMATIC)
         self.tile_centers = tile_centers
         self.tile_vertices = tile_vertices 
@@ -23,6 +24,11 @@ class Simulation(object):
         self.selected = None
         self.static_pins = []
         self.max_scr = 1
+        self.center_bodies = []
+        self.center_shapes = []
+        self.expansion_springs = []
+        self.rotary_springs = []
+
         self.reset()
 
         self.handler = EventHandler(self)
@@ -30,8 +36,6 @@ class Simulation(object):
         _, self.height = self.screen.get_size()
 
         # add bodies and shapes to centers of tiles
-        self.center_bodies = []
-        self.center_shapes = []
         for i in range(len(self.tile_centers)):
             (node_x, node_y) = self.tile_centers[i]
             mass = 10
@@ -88,6 +92,7 @@ class Simulation(object):
                     self.spring_anchor_coords = (Vec2d.normalized(body.position - Vec2d(self.pattern_center)) * spring_circle_radius) + Vec2d(self.pattern_center) 
                     ds = pm.DampedSpring(body, self.space.static_body, (0,0), self.spring_anchor_coords, 0, self.params['SPRING_STIFFNESS'], self.params['SPRING_DAMPING'])
                     self.space.add(ds)
+                    self.expansion_springs.append(ds)
                 else:
                     print("Auto-Expansion Note: There was a tile center point lying on the pattern center, which the simulation did not attach an expanding spring to.")
         self.reset()
@@ -107,6 +112,14 @@ class Simulation(object):
         for shape in self.space.shapes:
             shape.color = color
         self.max_scr = 1
+
+        # temp_time = str("{date:%Y%m%d_%H%M%S}".format(date=datetime.datetime.now()))
+        # save_centers_file = open("kirigami_simulation_centers" + temp_time + ".txt", "x")
+        # print("Saved file of current tile centers to " + "kirigami_simulation_centers" + temp_time + ".txt")
+        # current_centers = []
+        # for center in self.center_shapes:
+        #     save_centers_file.write(str(round((center.body.position[0] - self.params["X_OFFSET"]) / self.params["VERTEX_MULTIPLIER"], 3)) + " " + str(round((center.body.position[1] - self.params["Y_OFFSET"]) / self.params["VERTEX_MULTIPLIER"], 3)) + "\n")
+        # save_centers_file.close()
 
 
     # maybe need to move this to a drawer class that takes simulation and also screen

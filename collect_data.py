@@ -8,19 +8,27 @@ import pymunk.pygame_util
 import numpy as np
 from simulation import Simulation
 import os
+import pandas as pd
 
 spring_stiffness = 80
 spring_damping = 1000
 
 secs_to_simulate = 30 # number of seconds to simulate
 
+# info for saving file
+data_params = {
+    "pattern": "penrose",
+    "pattern_tiles": 110,
+    "pattern_connection": "expansion"
+}
+
 # files - data collection script assumes auto expand is always on
-vertices_file = open("info_files/penrose110_nothinrhombs_vertices.txt")
-constraints_file = open("info_files/penrose110_nothinrhombs_constraints1.txt")
-hull_file = open("info_files/penrose110_nothinrhombs_hull1.txt")
+vertices_file = open("info_files/penrose110_vertices.txt")
+constraints_file = open("info_files/penrose110_constraints1.txt")
+hull_file = open("info_files/penrose110_hull1.txt")
 
 # folder to save data to
-out_folder_name = "penrose_removal"
+out_folder_name = "penrose_expansion_jan13"
 if not os.path.exists(out_folder_name):
     os.makedirs(out_folder_name)
 os.makedirs(out_folder_name + "/centers")
@@ -87,12 +95,17 @@ def main():
 
     sim = Simulation(tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen)
 
+    print("Number of springs: " + len(sim.expansion_springs))
+
     # dt = 1./25. # time in seconds between simulation steps
     # steps_per_sample = 10 # record a data sample every __ steps of the simulation
 
     samples_per_second = 10 # number of data samples to take per second
     steps_per_sample = 25 # number of simulation steps to take for each sample
     dt = 1. / (samples_per_second * steps_per_sample) # step size to take in simulation
+
+    # initialize dataframe
+    rows_list = []
 
     steps_taken = 0
     for i in range(secs_to_simulate * samples_per_second):
@@ -123,15 +136,31 @@ def main():
             save_centers_file.write(str(round((center.body.position[0] - sim.params["X_OFFSET"]) / sim.params["VERTEX_MULTIPLIER"], 3)) + " " + str(round((center.body.position[1] - sim.params["Y_OFFSET"]) / sim.params["VERTEX_MULTIPLIER"], 3)) + "\n")
         save_centers_file.close()
 
+        time_elapsed = i / samples_per_second
+
         # collect area in a single list/1D numpy array
 
         # collect hull springs impulses in a 2D array (cols = springs, rows = impulse at sample point)
+        for index, spring in enumerate(sim.expansion_springs):
+            row = data_params.copy()
+            row["time_elapsed"] = time_elapsed
+            row["spring_index"] = index
+            row["spring_type"] = "hull"
+            row["last_impulse"] = spring.impulse
+            row["last_force"] = spring.impulse / dt
+
+            rows_list.append(row)
 
         # collect angular spring impulses in a 2D array
+
+        # collect edge spring impulses somewhere
 
 
         for _ in range(steps_per_sample):
             sim.space.step(dt)
+
+    df = pd.DataFrame(rows_list)
+    df.to_csv(out_folder_name + "/springs.csv", index = False)
 
 if __name__ == '__main__':
     sys.exit(main())
