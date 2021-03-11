@@ -156,15 +156,13 @@ def main():
             screen.blit(font.render("Max SCR Observed: " + str(sim.max_scr), 1, THECOLORS["darkgrey"]), (5,30))
             screen.blit(font.render("Hull Perimeter: " + str(perimeter), 1, THECOLORS["darkgrey"]), (5,45))
 
-            # number spring index
-            for i, spring in enumerate(sim.expansion_springs):
-                coords = (sim.center_shapes[sim.hull_tiles[i]].body.position[0], height - sim.center_shapes[sim.hull_tiles[i]].body.position[1])
-                screen.blit(font.render(str(i), 1, THECOLORS["darkgrey"]), coords)
+            # # number spring index
+            # for i, spring in enumerate(sim.expansion_springs):
+            #     coords = (sim.center_shapes[sim.hull_tiles[i]].body.position[0], height - sim.center_shapes[sim.hull_tiles[i]].body.position[1])
+            #     screen.blit(font.render(str(i), 1, THECOLORS["darkgrey"]), coords)
 
         pygame.display.flip()
         clock.tick(fps)
-
-        # collect spring impulse data here
         
 if __name__ == '__main__':
     sys.exit(main())

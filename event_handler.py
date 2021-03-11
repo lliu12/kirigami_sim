@@ -36,12 +36,10 @@ class EventHandler():
             for body in self.sim.space.bodies[:]:
                 body.apply_impulse_at_local_point((-6000,0))
         if event.type == pygame.USEREVENT+2:
-            # max_scr = 0
             self.sim.reset()
             
         # press r to reset the pattern to contracted state
         elif event.type == KEYDOWN and event.key == K_r and self.sim.params["IS_INTERACTIVE"]:
-            # max_scr = 0
             self.sim.reset()
 
         # press v to save a file of current vertex locations
@@ -54,12 +52,6 @@ class EventHandler():
             print("Saved file of current vertices to " + "kirigami_simulation_vertices" + temp_time + ".txt")
             current_vertices = []
             for center in self.sim.center_shapes:
-                # # commented out version flips vertices upside down when saving
-                # vertices = map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
-                #                                         self.sim.height - (x.rotated(center.body.angle) + center.body.position)[1]),
-                #                                                 center.get_vertices())
-                # for pos in vertices:
-                #     save_vertices_file.write(str(round((pos[0] - self.sim.params["X_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"], 3)) + " " + str(round(((pos[1] - self.sim.params["Y_OFFSET"]) / self.sim.params["VERTEX_MULTIPLIER"]), 3)) + " ")
                 vertices = map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
                                                         (x.rotated(center.body.angle) + center.body.position)[1]),
                                                                 center.get_vertices())

@@ -83,12 +83,10 @@ class Simulation(object):
             self.space.add(pin)
             self.tile_pinjoints.append(pin)
 
-        
+        # if AUTO_EXPAND, add springs pulling hull tiles outward      
         if self.params['AUTO_EXPAND'] or self.params['CALCULATE_AREA_PERIM']:
-            # this code adds a spring for every tile center of tiles in the hull
             self.hull_tiles = list(set(list(zip(*(self.hull_vertices)))[0]))
 
-    # if AUTO_EXPAND, add springs pulling hull tiles outward
         if self.params['AUTO_EXPAND']:
             spring_circle_radius = 500
             for t in self.hull_tiles:
@@ -101,15 +99,6 @@ class Simulation(object):
                 else:
                     print("Auto-Expansion Note: There was a tile center point lying on the pattern center, which the simulation did not attach an expanding spring to.")
         self.reset()
-
-        # is this even doing anything?? attempt to add rotary / angular / rotational springs
-        if self.add_rotary_springs:
-            for c in self.tile_pinjoints:
-                # if c.distance < .0001
-                rs = pm.DampedRotarySpring(c.a, c.b, 0, 900, 10)
-                self.space.add(rs)
-                self.rotary_springs.append(rs)
-
 
     def reset(self):
         for body in self.space.bodies:
@@ -127,16 +116,6 @@ class Simulation(object):
             shape.color = color
         self.max_scr = 1
 
-        # temp_time = str("{date:%Y%m%d_%H%M%S}".format(date=datetime.datetime.now()))
-        # save_centers_file = open("kirigami_simulation_centers" + temp_time + ".txt", "x")
-        # print("Saved file of current tile centers to " + "kirigami_simulation_centers" + temp_time + ".txt")
-        # current_centers = []
-        # for center in self.center_shapes:
-        #     save_centers_file.write(str(round((center.body.position[0] - self.params["X_OFFSET"]) / self.params["VERTEX_MULTIPLIER"], 3)) + " " + str(round((center.body.position[1] - self.params["Y_OFFSET"]) / self.params["VERTEX_MULTIPLIER"], 3)) + "\n")
-        # save_centers_file.close()
-
-
-    # maybe need to move this to a drawer class that takes simulation and also screen
     def draw_shapes(self):
         if not self.params['FOURIER']:
             for i in range(len(self.center_shapes)):
@@ -173,13 +152,11 @@ class Simulation(object):
                     pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
                     p1 = self.to_pygame(pv1)
                     p2 = self.to_pygame(pv2)
-                    # try color-coding springs based on last impulse
-                    last_impulse = c.impulse
-                    print(last_impulse)
-                    cmap_result = cmap(last_impulse / 200 + .5)
-                    cur_color = pygame.Color((255 * np.array(cmap_result)).astype('uint8'))
-                    pygame.draw.aalines(self.screen, cur_color, False, [p1,p2])
-                    # pygame.draw.aalines(self.screen, THECOLORS["black"], False, [p1,p2])
+                    # # try color-coding springs based on last impulse to visualize forces
+                    # last_impulse = c.impulse
+                    # cmap_result = cmap(last_impulse / 200 + .5)
+                    # cur_color = pygame.Color((255 * np.array(cmap_result)).astype('uint8'))
+                    # pygame.draw.aalines(self.screen, cur_color, False, [p1,p2])
 
                 else:
                     pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
