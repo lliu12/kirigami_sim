@@ -46,6 +46,8 @@ class EventHandler():
 
         # press v to save a file of current vertex locations
         # vertices are saved with the offset/multiplier transformations done earlier for display purposes undone
+
+        # note: currently can only save one per second
         elif event.type == KEYDOWN and event.key == K_v and self.sim.params["IS_INTERACTIVE"]:
             temp_time = str("{date:%Y%m%d_%H%M%S}".format(date=datetime.datetime.now()))
             save_vertices_file = open("kirigami_simulation_vertices" + temp_time + ".txt", "x")

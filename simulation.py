@@ -8,6 +8,8 @@ import pymunk as pm
 from pymunk import Vec2d
 import pymunk.pygame_util
 from event_handler import EventHandler
+import numpy as np
+import matplotlib.pyplot as plt
 
 class Simulation(object):
     def __init__(self, tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen, damping = .6, iterations = 20, add_rotary_springs = False):
@@ -26,7 +28,9 @@ class Simulation(object):
         self.max_scr = 1
         self.center_bodies = []
         self.center_shapes = []
+        self.tile_pinjoints = []
         self.expansion_springs = []
+        self.add_rotary_springs = add_rotary_springs
         self.rotary_springs = []
 
         self.reset()
@@ -75,13 +79,14 @@ class Simulation(object):
         for c in self.constraints:
             a = self.center_bodies[(c[0])]
             b = self.center_bodies[(c[2])]
-            pin = pm.PinJoint(a, b, (self.tile_vertices[(c[0])][(c[1])][0] - a.position.x, self.tile_vertices[(c[0])][(c[1])][1] - a.position.y), (tile_vertices[(c[2])][(c[3])][0] - b.position.x, tile_vertices[(c[2])][(c[3])][1] - b .position.y))
+            pin = pm.PinJoint(a, b, (self.tile_vertices[(c[0])][(c[1])][0] - a.position.x, self.tile_vertices[(c[0])][(c[1])][1] - a.position.y), (self.tile_vertices[(c[2])][(c[3])][0] - b.position.x, self.tile_vertices[(c[2])][(c[3])][1] - b .position.y))
             self.space.add(pin)
+            self.tile_pinjoints.append(pin)
 
         
         if self.params['AUTO_EXPAND'] or self.params['CALCULATE_AREA_PERIM']:
             # this code adds a spring for every tile center of tiles in the hull
-            self.hull_tiles = list(zip(*(self.hull_vertices)))[0]
+            self.hull_tiles = list(set(list(zip(*(self.hull_vertices)))[0]))
 
     # if AUTO_EXPAND, add springs pulling hull tiles outward
         if self.params['AUTO_EXPAND']:
@@ -96,6 +101,15 @@ class Simulation(object):
                 else:
                     print("Auto-Expansion Note: There was a tile center point lying on the pattern center, which the simulation did not attach an expanding spring to.")
         self.reset()
+
+        # is this even doing anything?? attempt to add rotary / angular / rotational springs
+        if self.add_rotary_springs:
+            for c in self.tile_pinjoints:
+                # if c.distance < .0001
+                rs = pm.DampedRotarySpring(c.a, c.b, 0, 900, 10)
+                self.space.add(rs)
+                self.rotary_springs.append(rs)
+
 
     def reset(self):
         for body in self.space.bodies:
@@ -125,13 +139,6 @@ class Simulation(object):
     # maybe need to move this to a drawer class that takes simulation and also screen
     def draw_shapes(self):
         if not self.params['FOURIER']:
-            for c in self.space.constraints:
-                pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
-                pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
-                p1 = self.to_pygame(pv1)
-                p2 = self.to_pygame(pv2)
-                pygame.draw.aalines(self.screen, THECOLORS["lightskyblue1"], False, [p1,p2])
-
             for i in range(len(self.center_shapes)):
                 center = self.center_shapes[i]
                 (node_x, node_y) = center.body.position
@@ -150,6 +157,36 @@ class Simulation(object):
                                         THECOLORS["lightskyblue3"], 
                                         list(map(lambda x: self.to_pygame(x),
                                         [self.vertex_bodies[(v[0])][(v[1])].position for v in self.hull_vertices])), 1)
+
+            for c in self.space.constraints:
+                cmap = plt.cm.get_cmap('Spectral')
+                if c in self.rotary_springs:
+                    pv1 = c.a.position
+                    pv2 = c.b.position
+                    p1 = self.to_pygame(pv1)
+                    p2 = self.to_pygame(pv2)
+                    pygame.draw.aalines(self.screen, THECOLORS["green"], False, [p1,p2])
+
+
+                if c in self.expansion_springs:
+                    pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
+                    pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
+                    p1 = self.to_pygame(pv1)
+                    p2 = self.to_pygame(pv2)
+                    # try color-coding springs based on last impulse
+                    last_impulse = c.impulse
+                    print(last_impulse)
+                    cmap_result = cmap(last_impulse / 200 + .5)
+                    cur_color = pygame.Color((255 * np.array(cmap_result)).astype('uint8'))
+                    pygame.draw.aalines(self.screen, cur_color, False, [p1,p2])
+                    # pygame.draw.aalines(self.screen, THECOLORS["black"], False, [p1,p2])
+
+                else:
+                    pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
+                    pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
+                    p1 = self.to_pygame(pv1)
+                    p2 = self.to_pygame(pv2)
+                    pygame.draw.aalines(self.screen, THECOLORS["lightskyblue1"], False, [p1,p2])
                 
             for s in self.static_pins:
                pygame.draw.circle(self.screen, THECOLORS["royalblue1"], self.to_pygame(s.b.position), 5)

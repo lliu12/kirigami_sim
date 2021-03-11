@@ -17,18 +17,17 @@ secs_to_simulate = 30 # number of seconds to simulate
 
 # info for saving file
 data_params = {
-    "pattern": "penrose",
-    "pattern_tiles": 110,
-    "pattern_connection": "expansion"
+    "pattern": "ammannbeenker",
+    "pattern_tiles": 72,
+    "pattern_connection": "hamiltonian"
 }
 
-# files - data collection script assumes auto expand is always on
-vertices_file = open("info_files/penrose110_vertices.txt")
-constraints_file = open("info_files/penrose110_constraints1.txt")
-hull_file = open("info_files/penrose110_hull1.txt")
+vertices_file = open("info_files/ammannbeenker72_vertices.txt")
+constraints_file = open("info_files/ammannbeenker72_constraints3.txt")
+hull_file = open("info_files/ammannbeenker72_hull3.txt")
 
 # folder to save data to
-out_folder_name = "penrose_expansion_jan13"
+out_folder_name = "ammannbeenker_hamiltonian_feb11"
 if not os.path.exists(out_folder_name):
     os.makedirs(out_folder_name)
 os.makedirs(out_folder_name + "/centers")
@@ -95,7 +94,7 @@ def main():
 
     sim = Simulation(tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen)
 
-    print("Number of springs: " + len(sim.expansion_springs))
+    print("Number of springs: " + str(len(sim.expansion_springs)))
 
     # dt = 1./25. # time in seconds between simulation steps
     # steps_per_sample = 10 # record a data sample every __ steps of the simulation
@@ -160,7 +159,7 @@ def main():
             sim.space.step(dt)
 
     df = pd.DataFrame(rows_list)
-    df.to_csv(out_folder_name + "/springs.csv", index = False)
+    df.to_csv(out_folder_name + "/" + out_folder_name + "springs.csv", index = False)
 
 if __name__ == '__main__':
     sys.exit(main())

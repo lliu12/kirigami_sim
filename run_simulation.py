@@ -9,12 +9,13 @@ from pymunk import Vec2d
 import pymunk.pygame_util
 import numpy as np
 from simulation import Simulation
+import matplotlib.pyplot as plt
 
 # constants
 # offsets + scaling constant to help get vertices centered in the display screen
-X_OFFSET = 150
-Y_OFFSET = 150
-VERTEX_MULTIPLIER = .6
+X_OFFSET = 350
+Y_OFFSET = 350
+VERTEX_MULTIPLIER = .5
 DISPLAY_SIZE = (800,800)
 IS_INTERACTIVE = True
 # use a given hull file to calculate and display the area of the pattern
@@ -26,15 +27,16 @@ AUTO_EXPAND = True
 spring_stiffness = 80
 spring_damping = 1000
 
+ADD_ROTARY_SPRINGS = False
+
 
 # files
 vertices_file = open("info_files/penrose110_vertices.txt")
-constraints_file = open("info_files/penrose110_constraints1.txt")
-
+constraints_file = open("info_files/penrose110_constraints2.txt")
 
 if CALCULATE_AREA_PERIM or AUTO_EXPAND:
-    hull_file = None
-    hull_file = open("info_files/penrose110_hull1.txt")
+    hull_file = open("info_files/penrose110_hull2.txt")
+
 
 # read vertices into tile_vertices
 # ith row of vertices file should hold coordinates for the ith tile's vertices, in the form x1 y1 x2 y2 ... 
@@ -111,7 +113,6 @@ def main():
         "X_OFFSET": X_OFFSET,
         "Y_OFFSET": Y_OFFSET,
         "VERTEX_MULTIPLIER": VERTEX_MULTIPLIER,
-        "DISPLAY_SIZE": DISPLAY_SIZE,
         "IS_INTERACTIVE": IS_INTERACTIVE,
         "CALCULATE_AREA_PERIM": CALCULATE_AREA_PERIM,
         "FOURIER": FOURIER,
@@ -120,7 +121,7 @@ def main():
         "SPRING_DAMPING": spring_damping
     }
 
-    sim = Simulation(tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen)
+    sim = Simulation(tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen, add_rotary_springs= ADD_ROTARY_SPRINGS)
 
     while running:
         for event in pygame.event.get():
@@ -133,9 +134,9 @@ def main():
 
         # Update physics
         fps = 25
-        iterations = 20
+        iterations = 10
         dt = 1.0/float(fps)/float(iterations)
-        for _ in range(iterations): # 10 iterations to get a more stable simulation
+        for _ in range(iterations):
             sim.space.step(dt)
         
         # Flip screen
@@ -155,8 +156,15 @@ def main():
             screen.blit(font.render("Max SCR Observed: " + str(sim.max_scr), 1, THECOLORS["darkgrey"]), (5,30))
             screen.blit(font.render("Hull Perimeter: " + str(perimeter), 1, THECOLORS["darkgrey"]), (5,45))
 
+            # number spring index
+            for i, spring in enumerate(sim.expansion_springs):
+                coords = (sim.center_shapes[sim.hull_tiles[i]].body.position[0], height - sim.center_shapes[sim.hull_tiles[i]].body.position[1])
+                screen.blit(font.render(str(i), 1, THECOLORS["darkgrey"]), coords)
+
         pygame.display.flip()
         clock.tick(fps)
+
+        # collect spring impulse data here
         
 if __name__ == '__main__':
     sys.exit(main())
