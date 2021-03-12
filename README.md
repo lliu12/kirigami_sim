@@ -1,6 +1,6 @@
 # 2D Kirigami Deployment Simulator
 
-![Penrose Pattern](https://github.com/lliu12/kirigami_sim/blob/master/gifs/penrose_hamiltonian.gif)
+<img src = "https://github.com/lliu12/kirigami_sim/blob/master/gifs/penrose_hamiltonian.gif" width="400" height="400" />
 
 This code simulates the 2D deployment process of a kirigami pattern given its tile geometry and connectivity. The code is written in Python using the 2D rigid body physics library Pymunk.
 
