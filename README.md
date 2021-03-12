@@ -1,6 +1,6 @@
 # 2D Kirigami Deployment Simulator
 
-<img src = "https://github.com/lliu12/kirigami_sim/blob/master/gifs/penrose_hamiltonian.gif" width="400" height="400" />
+<img src = "https://github.com/lliu12/kirigami_sim/blob/master/gifs/penrose_hamiltonian.gif" width="400" height="400" /> <img src = "https://github.com/lliu12/kirigami_sim/blob/master/gifs/penrose_expansion.gif" width="400" height="400" />
 
 This code simulates the 2D deployment process of a kirigami pattern given its tile geometry and connectivity. The code is written in Python using the 2D rigid body physics library Pymunk.
 
@@ -56,7 +56,9 @@ The hull file specifies which vertices make up the outer hull of the pattern, in
 Additional notes:
 * DISPLAY_SIZE, X_OFFSET, Y_OFFSET, and VERTEX_MULTIPLIER can be used to adjust the scale and view of the expanding pattern; different patterns will be best viewed with different values for these
 * When IS_INTERACTIVE is true, users can click and drag to interact with tiles, right click to pin tiles, press p to save a screenshot of the simulation, press r to reset the simulation, and press v or c to save a file with the current tile vertex/center locations
+* To use the simulation without a hull file, set AUTO_EXPAND and CALCULATE_AREA_PERIM to false
 * There are compatibility issues between certain versions of Python and Pygame. This may be a reason why the simulation is not working.
+* The animations above are produced using data from the simulation, plus additional processing
 
 
 
