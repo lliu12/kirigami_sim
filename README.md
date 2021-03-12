@@ -11,16 +11,26 @@ L. Liu, G. P. T. Choi, and L. Mahadevan, "Quasicrystal kirigami." Preprint, 2021
 
 A set of deployable quasicrystal patterns (a variety of 5-fold Penrose, 8-fold Ammann-Beenker, 12-fold Stampfli patterns of different sizes) have been included as examples in the info_files folder.
 
-Usage examples: 
+Usage:
+
+Run "python3 run_simulation.py" after setting the desired vertices, constraints, and hull files inside the .py files.
+
+File examples:
 
 Penrose expansion,  5-layer pattern
-vertices_file: penrose110_vertices.txt, constraints_file: penrose110_expansion_constraints.txt, hull_file: penrose110_expansion_hull.txt
+* vertices_file: _penrose110_vertices.txt_, 
+* constraints_file: _penrose110_expansion_constraints.txt_, 
+* hull_file: _penrose110_expansion_hull.txt_
 
 Penrose hamiltonian, 5-layer pattern
-vertices_file: penrose110_vertices.txt, constraints_file: penrose110_hamiltonian_constraints.txt, hull_file: penrose110_hamiltonian_hull.txt
+* vertices_file: _penrose110_vertices.txt_, 
+* constraints_file: _penrose110_hamiltonian_constraints.txt_, 
+* hull_file: _penrose110_hamiltonian_hull.txt_
 
 Penrose removal, 5-layer pattern
-vertices_file: penrose110_nothinrhombs_vertices.txt, constraints_file: penrose110_nothinrhombs_constraints1.txt, hull_file: penrose110_nothinrhombs_hull1.txt
+* vertices_file: _penrose110_nothinrhombs_vertices.txt_, 
+* constraints_file: _penrose110_nothinrhombs_constraints1.txt_, 
+* hull_file: _penrose110_nothinrhombs_hull1.txt_
 
 ============================================================
 
@@ -41,11 +51,9 @@ The hull file specifies which vertices make up the outer hull of the pattern, in
 ============================================================
 
 Additional notes:
-\begin{itemize}
-\item DISPLAY_SIZE, X_OFFSET, Y_OFFSET, and VERTEX_MULTIPLIER can be used to adjust the scale and view of the expanding pattern; different patterns will be best viewed with different values for these
-\item When IS_INTERACTIVE is true, users can click and drag to interact with tiles, right click to pin tiles, press p to save a screenshot of the simulation, press r to reset the simulation, and press v or c to save a file with the current tile vertex/center locations
-\item There are compatibility issues between certain versions of Python and Pygame. This may be a reason why the simulation is not working.
-\end{itemize}
+* DISPLAY_SIZE, X_OFFSET, Y_OFFSET, and VERTEX_MULTIPLIER can be used to adjust the scale and view of the expanding pattern; different patterns will be best viewed with different values for these
+* When IS_INTERACTIVE is true, users can click and drag to interact with tiles, right click to pin tiles, press p to save a screenshot of the simulation, press r to reset the simulation, and press v or c to save a file with the current tile vertex/center locations
+* There are compatibility issues between certain versions of Python and Pygame. This may be a reason why the simulation is not working.
 
 
 
