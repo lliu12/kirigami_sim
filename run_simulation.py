@@ -24,16 +24,18 @@ CALCULATE_AREA_PERIM = True
 VERTICES_ONLY = False
 # automatically apply force with this magnitude outwards on pattern
 AUTO_EXPAND = True
+# display expansion springs
+DISPLAY_EXPANSION_SPRINGS = False
 spring_stiffness = 80
 spring_damping = 1000
 
 
 # files
-vertices_file = open("info_files/penrose25_vertices.txt")
-constraints_file = open("info_files/penrose25_hamiltonian_constraints.txt")
+vertices_file = open("info_files/penrose110_vertices.txt")
+constraints_file = open("info_files/penrose110_hamiltonian_constraints.txt")
 
 if CALCULATE_AREA_PERIM or AUTO_EXPAND:
-    hull_file = open("info_files/penrose25_hamiltonian_hull.txt")
+    hull_file = open("info_files/penrose110_hamiltonian_hull.txt")
 
 
 # read vertices into tile_vertices
@@ -111,7 +113,8 @@ def main():
         "VERTICES_ONLY": VERTICES_ONLY,
         "AUTO_EXPAND": AUTO_EXPAND,
         "SPRING_STIFFNESS": spring_stiffness,
-        "SPRING_DAMPING": spring_damping
+        "SPRING_DAMPING": spring_damping,
+        "DISPLAY_EXPANSION_SPRINGS": DISPLAY_EXPANSION_SPRINGS
     }
 
     sim = Simulation(tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen)

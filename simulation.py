@@ -137,11 +137,12 @@ class Simulation(object):
 
             for c in self.space.constraints:
                 if c in self.expansion_springs:
-                    pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
-                    pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
-                    p1 = self.to_pygame(pv1)
-                    p2 = self.to_pygame(pv2)
-                    pygame.draw.aalines(self.screen, THECOLORS["lightskyblue1"], False, [p1,p2]) # remove this line to hide the springs
+                    if self.params["DISPLAY_EXPANSION_SPRINGS"]:
+                        pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
+                        pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
+                        p1 = self.to_pygame(pv1)
+                        p2 = self.to_pygame(pv2)
+                        pygame.draw.aalines(self.screen, THECOLORS["lightskyblue1"], False, [p1,p2]) # remove this line to hide the springs
 
                 else:
                     pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
