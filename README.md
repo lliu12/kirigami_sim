@@ -58,7 +58,7 @@ Additional notes:
 * When IS_INTERACTIVE is true, users can click and drag to interact with tiles, right click to pin tiles, press p to save a screenshot of the simulation, press r to reset the simulation, and press v or c to save a file with the current tile vertex/center locations.
 * To use the simulation without a hull file, set AUTO_EXPAND and CALCULATE_AREA_PERIM to false.
 * There are compatibility issues between certain versions of Python and Pygame. This may be a reason why the simulation is not working.
-* The animations above are produced using data from the simulation, plus additional processing.
+* The animations above are produced using data from the simulation, plus additional processing to assign colors, etc.
 
 
 
