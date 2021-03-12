@@ -20,22 +20,20 @@ DISPLAY_SIZE = (800,800)
 IS_INTERACTIVE = True
 # use a given hull file to calculate and display the area of the pattern
 CALCULATE_AREA_PERIM = True
-# only display the vertices of shapes (so screenshots can be used for fourier transform)
-FOURIER = False
+# only display tile vertices
+VERTICES_ONLY = False
 # automatically apply force with this magnitude outwards on pattern
 AUTO_EXPAND = True
 spring_stiffness = 80
 spring_damping = 1000
 
-ADD_ROTARY_SPRINGS = False
-
 
 # files
-vertices_file = open("info_files/penrose110_vertices.txt")
-constraints_file = open("info_files/penrose110_constraints2.txt")
+vertices_file = open("info_files/penrose25_vertices.txt")
+constraints_file = open("info_files/penrose25_hamiltonian_constraints.txt")
 
 if CALCULATE_AREA_PERIM or AUTO_EXPAND:
-    hull_file = open("info_files/penrose110_hull2.txt")
+    hull_file = open("info_files/penrose25_hamiltonian_hull.txt")
 
 
 # read vertices into tile_vertices
@@ -46,7 +44,6 @@ for l in (vertices_file.read().splitlines()):
     tile_vertices.append([(float(line[i-1]) * VERTEX_MULTIPLIER + X_OFFSET, float(line[i]) * VERTEX_MULTIPLIER + Y_OFFSET) 
                           for i in range(len(line)) if i % 2 == 1])
 
-# calculate tile centers by averaging x and y coords of vertices
 # return the center of a single tile given a list of its vertices
 def get_center(t):
     tt = np.array(t)
@@ -55,7 +52,7 @@ def get_center(t):
     return (x_av, y_av)
 tile_centers = [get_center(t) for t in tile_vertices]
 
-# calculate the center of the whole pattern by averaging x and y coords of tile centers
+# calculate center of the whole pattern
 pattern_center = get_center(tile_centers)
 
 # read constraints from txt file into a list where each row has the form:
@@ -93,9 +90,6 @@ if CALCULATE_AREA_PERIM or AUTO_EXPAND:
         pos2 = tile_vertices[(v2[0])][(v2[1])]
         perimeter += np.linalg.norm(np.array(pos1) - np.array(pos2))
 
-    
-    # for i in range(len(hull_vertices)):
-    #     perimeter += np.linalg.norm(np.array(hull_vertices[i]) - np.array(hull_vertices[(i + 1) % len(hull_vertices)]))
 else:
     hull_vertices = None
 
@@ -104,7 +98,6 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(DISPLAY_SIZE, 0) 
     _, height = screen.get_size()
-    # max_scr = 1
     clock = pygame.time.Clock()
     running = True
     font = pygame.font.Font(None, 16)
@@ -115,13 +108,13 @@ def main():
         "VERTEX_MULTIPLIER": VERTEX_MULTIPLIER,
         "IS_INTERACTIVE": IS_INTERACTIVE,
         "CALCULATE_AREA_PERIM": CALCULATE_AREA_PERIM,
-        "FOURIER": FOURIER,
+        "VERTICES_ONLY": VERTICES_ONLY,
         "AUTO_EXPAND": AUTO_EXPAND,
         "SPRING_STIFFNESS": spring_stiffness,
         "SPRING_DAMPING": spring_damping
     }
 
-    sim = Simulation(tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen, add_rotary_springs= ADD_ROTARY_SPRINGS)
+    sim = Simulation(tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen)
 
     while running:
         for event in pygame.event.get():
@@ -155,11 +148,6 @@ def main():
                 sim.max_scr = current_scr
             screen.blit(font.render("Max SCR Observed: " + str(sim.max_scr), 1, THECOLORS["darkgrey"]), (5,30))
             screen.blit(font.render("Hull Perimeter: " + str(perimeter), 1, THECOLORS["darkgrey"]), (5,45))
-
-            # # number spring index
-            # for i, spring in enumerate(sim.expansion_springs):
-            #     coords = (sim.center_shapes[sim.hull_tiles[i]].body.position[0], height - sim.center_shapes[sim.hull_tiles[i]].body.position[1])
-            #     screen.blit(font.render(str(i), 1, THECOLORS["darkgrey"]), coords)
 
         pygame.display.flip()
         clock.tick(fps)

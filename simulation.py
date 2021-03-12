@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Simulation(object):
-    def __init__(self, tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen, damping = .6, iterations = 20, add_rotary_springs = False):
+    def __init__(self, tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen, damping = .6, iterations = 20):
         self.params = params
         self.space = pm.Space()
         self.space.damping = damping
@@ -30,8 +30,6 @@ class Simulation(object):
         self.center_shapes = []
         self.tile_pinjoints = []
         self.expansion_springs = []
-        self.add_rotary_springs = add_rotary_springs
-        self.rotary_springs = []
 
         self.reset()
 
@@ -117,7 +115,7 @@ class Simulation(object):
         self.max_scr = 1
 
     def draw_shapes(self):
-        if not self.params['FOURIER']:
+        if not self.params['VERTICES_ONLY']:
             for i in range(len(self.center_shapes)):
                 center = self.center_shapes[i]
                 (node_x, node_y) = center.body.position
@@ -138,25 +136,12 @@ class Simulation(object):
                                         [self.vertex_bodies[(v[0])][(v[1])].position for v in self.hull_vertices])), 1)
 
             for c in self.space.constraints:
-                cmap = plt.cm.get_cmap('Spectral')
-                if c in self.rotary_springs:
-                    pv1 = c.a.position
-                    pv2 = c.b.position
-                    p1 = self.to_pygame(pv1)
-                    p2 = self.to_pygame(pv2)
-                    pygame.draw.aalines(self.screen, THECOLORS["green"], False, [p1,p2])
-
-
                 if c in self.expansion_springs:
                     pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
                     pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
                     p1 = self.to_pygame(pv1)
                     p2 = self.to_pygame(pv2)
-                    # # try color-coding springs based on last impulse to visualize forces
-                    # last_impulse = c.impulse
-                    # cmap_result = cmap(last_impulse / 200 + .5)
-                    # cur_color = pygame.Color((255 * np.array(cmap_result)).astype('uint8'))
-                    # pygame.draw.aalines(self.screen, cur_color, False, [p1,p2])
+                    pygame.draw.aalines(self.screen, THECOLORS["lightskyblue1"], False, [p1,p2]) # remove this line to hide the springs
 
                 else:
                     pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
@@ -168,7 +153,7 @@ class Simulation(object):
             for s in self.static_pins:
                pygame.draw.circle(self.screen, THECOLORS["royalblue1"], self.to_pygame(s.b.position), 5)
 
-        if self.params['FOURIER']:
+        if self.params['VERTICES_ONLY']:
             for center in self.center_shapes:
                 vertices = map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
                                                             self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
