@@ -2,7 +2,7 @@
 
 <img src = "https://github.com/lliu12/kirigami_sim/blob/master/media/penrose_expansion.gif" width="400" height="400" /><img src = "https://github.com/lliu12/kirigami_sim/blob/master/media/penrose_hamiltonian.gif" width="400" height="400" /> 
 
-This code simulates the 2D deployment process of a kirigami pattern given its tile geometry and connectivity. The code is written in Python using the 2D rigid body physics library Pymunk.
+This code simulates the 2D deployment process of a kirigami pattern given its tile geometry and connectivity. The code is written in Python using the 2D rigid body physics library [Pymunk](http://www.pymunk.org).
 
 Any comments and suggestions are welcome. 
 
@@ -62,7 +62,7 @@ Additional notes:
 * When IS_INTERACTIVE is true, users can click and drag to interact with tiles, right click to pin tiles, press p to save a screenshot of the simulation, press r to reset the simulation, and press v or c to save a file with the current tile vertex/center locations.
 * To use the simulation without a hull file, set AUTO_EXPAND and CALCULATE_AREA_PERIM to false.
 * Use DISPLAY_EXPANSION_SPRINGS to toggle whether or not to display the springs used for automatic deployment.
-* Physical properties like friction, damping, spring strength, and so on can all be set via [Pymunk](http://www.pymunk.org/en/latest/pymunk.html). Pymunk's documentation is a great resource for this.
+* Physical properties like friction, damping, spring strength, and so on can all be set via Pymunk. Pymunk's [documentation](http://www.pymunk.org/en/latest/pymunk.html) is a great resource for this.
 * There are compatibility issues between certain versions of Python and Pygame. This may be a reason why the simulation is not working.
 * The animations above are produced using data from the simulation, plus additional processing to assign colors, etc.
 
