@@ -43,6 +43,10 @@ The vertices file specifies the coordinates of each tile's vertices. Row i  cont
 
 [v1-x-coord | v1-y-coord | v2-x-coord | v2-y-coord | v3-x-coord .... ].
 
+An example showing how tiles were entered for the Penrose pattern is shown below. Tiles are numbered in order, and each tile's Vertex 1 is marked in red.
+
+<img src = "https://github.com/lliu12/kirigami_sim/blob/master/media/vertices_example.png" width="400" height="400" /> 
+
 In the constraints file, order of rows doesn't matter and each row takes the form 
 
 [Tile i | Vertex Number p in Tile i | Tile j | Vertex Number q in Tile j].
@@ -57,7 +61,8 @@ Additional notes:
 * DISPLAY_SIZE, X_OFFSET, Y_OFFSET, and VERTEX_MULTIPLIER can be used to adjust the scale and view of the expanding pattern; different patterns will be best viewed with different values for these.
 * When IS_INTERACTIVE is true, users can click and drag to interact with tiles, right click to pin tiles, press p to save a screenshot of the simulation, press r to reset the simulation, and press v or c to save a file with the current tile vertex/center locations.
 * To use the simulation without a hull file, set AUTO_EXPAND and CALCULATE_AREA_PERIM to false.
-* Physical properties like friction, damping, and so on can all be set via [Pymunk](http://www.pymunk.org/en/latest/pymunk.html). Pymunk's documentation is a great resource for this.
+* Use DISPLAY_EXPANSION_SPRINGS to toggle whether or not to display the springs used for automatic deployment.
+* Physical properties like friction, damping, spring strength, and so on can all be set via [Pymunk](http://www.pymunk.org/en/latest/pymunk.html). Pymunk's documentation is a great resource for this.
 * There are compatibility issues between certain versions of Python and Pygame. This may be a reason why the simulation is not working.
 * The animations above are produced using data from the simulation, plus additional processing to assign colors, etc.
 
