@@ -8,7 +8,7 @@ Any comments and suggestions are welcome.
 
 If you use this code in your own work, please cite the following paper:
 
-L. Liu, G. P. T. Choi, and L. Mahadevan, "Quasicrystal kirigami." Preprint, 2021.
+L. Liu, G. P. T. Choi, and L. Mahadevan, "[Quasicrystal kirigami.](https://arxiv.org/abs/2104.13399)" Preprint, arXiv:2104.13399, 2021.
 
 ============================================================
 
