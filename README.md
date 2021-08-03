@@ -8,7 +8,7 @@ Any comments and suggestions are welcome.
 
 If you use this code in your own work, please cite the following paper:
 
-L. Liu, G. P. T. Choi, and L. Mahadevan, "Quasicrystal kirigami." Preprint, 2021.
+L. Liu, G. P. T. Choi, and L. Mahadevan, "[Quasicrystal kirigami.](https://arxiv.org/abs/2104.13399)" Preprint, arXiv:2104.13399, 2021.
 
 ============================================================
 
@@ -16,7 +16,7 @@ A set of deployable quasicrystal patterns (a variety of 5-fold Penrose, 8-fold A
 
 Usage:
 
-Run "python3 run_simulation.py" after setting the desired vertices, constraints, and hull files inside the .py files.
+Run "run_simulation.py" after setting the desired vertices, constraints, and hull files inside the .py files.
 
 File examples:
 
@@ -25,7 +25,7 @@ Penrose expansion,  5-layer pattern
 * constraints_file: _penrose110_expansion_constraints.txt_, 
 * hull_file: _penrose110_expansion_hull.txt_
 
-Penrose hamiltonian, 5-layer pattern
+Penrose Hamiltonian, 5-layer pattern
 * vertices_file: _penrose110_vertices.txt_, 
 * constraints_file: _penrose110_hamiltonian_constraints.txt_, 
 * hull_file: _penrose110_hamiltonian_hull.txt_
@@ -39,7 +39,7 @@ Penrose removal, 5-layer pattern
 
 The simulation runs using data on a pattern's vertices, constraints, and hull. 
 
-The vertices file specifies the coordinates of each tile's vertices. Row i  contains the vertex coordinates for tile i and should be formatted (with vertices v in clockwise order) as 
+The vertices file specifies the coordinates of each tile's vertices. Row i contains the vertex coordinates for tile i and should be formatted (with vertices v in clockwise order) as 
 
 [v1-x-coord | v1-y-coord | v2-x-coord | v2-y-coord | v3-x-coord .... ].
 
@@ -51,7 +51,7 @@ In the constraints file, order of rows doesn't matter and each row takes the for
 
 [Tile i | Vertex Number p in Tile i | Tile j | Vertex Number q in Tile j].
 
-A pinjoint is made fixing the distance between vertex p of tile i and vertex q of tile j to be the same distance apart as they are in the contracted pattern state. For example, a row [1 3 2 1] would constrain Tile 1's third vertex and Tile 2's first vertex to be a fixed distance apart. If the two vertices were already in the same position, they will be "connected" and fixed to have the same position. Ideal expansion cuts were produced by constraining two vertices that were at opposite ends of an edge, which fixes the vertices to be one edge-length apart.
+A pinjoint is made fixing the distance between vertex p of tile i and vertex q of tile j to be the same distance apart as they are in the contracted pattern state. For example, a row [1 3 2 1] would constrain Tile 1's third vertex and Tile 2's first vertex to be a fixed distance apart. If the two vertices were already in the same position, they will be "connected" and fixed to have the same position. Ideal expansion tiles were produced by constraining two vertices that were at opposite ends of an edge, which fixes the vertices to be one edge-length apart.
 
 The hull file specifies which vertices make up the outer hull of the pattern, in clockwise order. It is needed only for calculating the area and simulating deployment with radial springs pulling outward. Each row takes the form [Tile i | Vertex p] to denote that tile i's pth vertex is a point on the pattern's hull. 
 
