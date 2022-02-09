@@ -83,14 +83,14 @@ class EventHandler():
                 ds = pm.DampedSpring(self.sim.mouse, shape.body, (0,0), (0,0), rest_length, 1000, 10)
                 self.sim.space.add(ds)
                 self.sim.selected = ds
-        
+
         elif event.type == MOUSEBUTTONDOWN and self.sim.params["IS_INTERACTIVE"] and event.button == RIGHT:
             if self.sim.selected != None:
                 self.sim.space.remove(self.sim.selected)
             p = self.sim.from_pygame(Vec2d(event.pos))
-            hit = self.sim.space.point_query_nearest(p, 0, pm.ShapeFilter())
-            if hit != None:
-                q = hit.shape.body
+            hit = self.sim.space.point_query(p, 0, pm.ShapeFilter())
+            if len(hit) > 0:
+                q = hit[0].shape.body
                 pinned_already = False
                 existing_pin = None
                 for a in self.sim.static_pins:
