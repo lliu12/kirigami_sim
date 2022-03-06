@@ -15,15 +15,15 @@ import matplotlib.pyplot as plt
 # offsets + scaling constant to help get vertices centered in the display screen
 X_OFFSET = 350
 Y_OFFSET = 350
-VERTEX_MULTIPLIER = .5
+VERTEX_MULTIPLIER = 25
 DISPLAY_SIZE = (800,800)
 IS_INTERACTIVE = True
 # use a given hull file to calculate and display the area of the pattern
-CALCULATE_AREA_PERIM = True
+CALCULATE_AREA_PERIM = False
 # only display tile vertices
 VERTICES_ONLY = False
 # automatically apply force with this magnitude outwards on pattern
-AUTO_EXPAND = True
+AUTO_EXPAND = False
 # display expansion springs
 DISPLAY_EXPANSION_SPRINGS = False
 spring_stiffness = 80
@@ -32,10 +32,10 @@ spring_damping = 1000
 
 # files
 vertices_file = open("info_files/penrose110_vertices.txt")
-constraints_file = open("info_files/penrose110_hamiltonian_constraints.txt")
+constraints_file = open("info_files/penrose110_expansion_constraints.txt")
 
 if CALCULATE_AREA_PERIM or AUTO_EXPAND:
-    hull_file = open("info_files/penrose110_hamiltonian_hull.txt")
+    hull_file = open("info_files/penrose110_expansion_hull.txt")
 
 
 # read vertices into tile_vertices

@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Simulation(object):
-    def __init__(self, tile_centers, tile_vertices, constraints, pattern_center, params, hull_vertices, screen, damping = .6, iterations = 20):
+    def __init__(self, tile_centers, tile_vertices, constraints, pattern_center, params, hull_info, screen, damping = .6, iterations = 20, hull_info_type = "VERTICES", spring_circle_radius = 500):
         self.params = params
         self.space = pm.Space()
         self.space.damping = damping
@@ -21,7 +21,9 @@ class Simulation(object):
         self.tile_centers = tile_centers
         self.tile_vertices = tile_vertices 
         self.constraints = constraints
-        self.hull_vertices = hull_vertices
+        self.hull_info = hull_info
+        assert hull_info_type == "VERTICES" or hull_info_type == "TILES" or hull_info_type is None
+        self.hull_info_type = hull_info_type
         self.pattern_center = pattern_center
         self.selected = None
         self.static_pins = []
@@ -30,6 +32,7 @@ class Simulation(object):
         self.center_shapes = []
         self.tile_pinjoints = []
         self.expansion_springs = []
+        self.spring_circle_radius = spring_circle_radius
 
         self.reset()
 
@@ -83,14 +86,29 @@ class Simulation(object):
 
         # if AUTO_EXPAND, add springs pulling hull tiles outward      
         if self.params['AUTO_EXPAND'] or self.params['CALCULATE_AREA_PERIM']:
-            self.hull_tiles = list(set(list(zip(*(self.hull_vertices)))[0]))
+            if self.hull_info_type == "VERTICES":
+                self.hull_tiles = list(set(list(zip(*(self.hull_info)))[0]))
+            elif self.hull_info_type == "TILES":
+                self.hull_tiles = self.hull_info
+            else:
+                assert(False, "invalid hull file type")
+
 
         if self.params['AUTO_EXPAND']:
-            spring_circle_radius = 500
             for t in self.hull_tiles:
                 body = self.center_bodies[t]
                 if body.position != self.pattern_center:
-                    self.spring_anchor_coords = (Vec2d.normalized(body.position - Vec2d(self.pattern_center)) * spring_circle_radius) + Vec2d(self.pattern_center) 
+                    if not self.params['AUTO_EXPAND_OBLONG']:
+                        self.spring_anchor_coords = (Vec2d.normalized(body.position - Vec2d(self.pattern_center)) * self.spring_circle_radius) + Vec2d(self.pattern_center) 
+
+                    else: 
+                        diff = Vec2d.normalized(body.position - Vec2d(self.pattern_center))
+                        if diff.x * diff.y >= 0:
+                            stretch_radius = self.spring_circle_radius / 4
+                        else:
+                            stretch_radius = self.spring_circle_radius / 3
+                        self.spring_anchor_coords = (Vec2d.normalized(body.position - Vec2d(self.pattern_center)) * stretch_radius) + Vec2d(self.pattern_center)
+
                     ds = pm.DampedSpring(body, self.space.static_body, (0,0), self.spring_anchor_coords, 0, self.params['SPRING_STIFFNESS'], self.params['SPRING_DAMPING'])
                     self.space.add(ds)
                     self.expansion_springs.append(ds)
@@ -129,11 +147,23 @@ class Simulation(object):
                                     list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
                                                         self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
                                                                 center.get_vertices())), 1)
+
+                font = pygame.font.Font(None, 16)
+
+                # draw in current position (badly)
+                # self.screen.blit(font.render(str(i + 1), 1, THECOLORS["darkgrey"]), list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
+                #                                         self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
+                #                                                 center.get_vertices()))[0])
+
+                # draw in initial position
+                # self.screen.blit(font.render(str(i + 1), 1, THECOLORS["darkgrey"]), [self.tile_centers[i][0], self.height - self.tile_centers[i][1]])
+
+
                 if self.params["CALCULATE_AREA_PERIM"]:
                     pygame.draw.polygon(self.screen, 
                                         THECOLORS["lightskyblue3"], 
                                         list(map(lambda x: self.to_pygame(x),
-                                        [self.vertex_bodies[(v[0])][(v[1])].position for v in self.hull_vertices])), 1)
+                                        [self.vertex_bodies[(v[0])][(v[1])].position for v in self.hull_info])), 1)
 
             for c in self.space.constraints:
                 if c in self.expansion_springs:
@@ -142,14 +172,14 @@ class Simulation(object):
                         pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
                         p1 = self.to_pygame(pv1)
                         p2 = self.to_pygame(pv2)
-                        pygame.draw.aalines(self.screen, THECOLORS["lightskyblue1"], False, [p1,p2]) # remove this line to hide the springs
+                        pygame.draw.aalines(self.screen, THECOLORS["skyblue"], False, [p1,p2]) # remove this line to hide the springs
 
                 else:
                     pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
                     pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
                     p1 = self.to_pygame(pv1)
                     p2 = self.to_pygame(pv2)
-                    pygame.draw.aalines(self.screen, THECOLORS["lightskyblue1"], False, [p1,p2])
+                    pygame.draw.aalines(self.screen, THECOLORS["skyblue"], False, [p1,p2])
                 
             for s in self.static_pins:
                pygame.draw.circle(self.screen, THECOLORS["royalblue1"], self.to_pygame(s.b.position), 5)
@@ -162,8 +192,10 @@ class Simulation(object):
                 for pos in vertices:
                     pygame.draw.circle(self.screen, THECOLORS["black"], pos, 1)
 
+        
+
     def to_pygame(self, p):
-        return int(p.x), int(-p.y+ self.height)
+        return int(p.x), int(self.height - p.y)
 
     def from_pygame(self, p): 
         return self.to_pygame(p)
