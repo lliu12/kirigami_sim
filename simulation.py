@@ -7,24 +7,23 @@ from pygame.color import *
 import pymunk as pm
 from pymunk import Vec2d
 import pymunk.pygame_util
-from event_handler import EventHandler
 import numpy as np
 import matplotlib.pyplot as plt
+from utils import *
 
 class Simulation(object):
-    def __init__(self, tile_centers, tile_vertices, constraints, pattern_center, params, hull_info, screen, damping = .6, iterations = 20, hull_info_type = "VERTICES", spring_circle_radius = 500):
+    def __init__(self, tile_vertices, constraints, params, hull_vertices, hull_tiles, damping = .6, iterations = 20, spring_circle_radius = 500):
         self.params = params
         self.space = pm.Space()
         self.space.damping = damping
         self.space.iterations = iterations
         self.mouse = pm.Body(body_type=pm.Body.KINEMATIC)
-        self.tile_centers = tile_centers
         self.tile_vertices = tile_vertices 
         self.constraints = constraints
-        self.hull_info = hull_info
-        assert hull_info_type == "VERTICES" or hull_info_type == "TILES" or hull_info_type is None
-        self.hull_info_type = hull_info_type
-        self.pattern_center = pattern_center
+        self.hull_tiles = hull_tiles
+        self.hull_vertices = hull_vertices
+        self.tile_centers = [get_center(t) for t in tile_vertices]
+        self.pattern_center = get_center(self.tile_centers) # calculate center of the whole pattern
         self.selected = None
         self.static_pins = []
         self.max_scr = 1
@@ -35,10 +34,6 @@ class Simulation(object):
         self.spring_circle_radius = spring_circle_radius
 
         self.reset()
-
-        self.handler = EventHandler(self)
-        self.screen = screen
-        _, self.height = self.screen.get_size()
 
         # add bodies and shapes to centers of tiles
         for i in range(len(self.tile_centers)):
@@ -85,20 +80,20 @@ class Simulation(object):
             self.tile_pinjoints.append(pin)
 
         # if AUTO_EXPAND, add springs pulling hull tiles outward      
-        if self.params['AUTO_EXPAND'] or self.params['CALCULATE_AREA_PERIM']:
-            if self.hull_info_type == "VERTICES":
-                self.hull_tiles = list(set(list(zip(*(self.hull_info)))[0]))
-            elif self.hull_info_type == "TILES":
-                self.hull_tiles = self.hull_info
-            else:
-                assert(False, "invalid hull file type")
+        # if self.params['auto_expand'] or self.params['calculate_area_perim']:
+        #     if self.hull_info_type == "VERTICES":
+        #         self.hull_tiles = list(set(list(zip(*(self.hull_info)))[0]))
+        #     elif self.hull_info_type == "TILES":
+        #         self.hull_tiles = self.hull_info
+        #     else:
+        #         assert(False, "invalid hull file type")
 
 
-        if self.params['AUTO_EXPAND']:
+        if self.params['auto_expand']:
             for t in self.hull_tiles:
                 body = self.center_bodies[t]
                 if body.position != self.pattern_center:
-                    if not self.params['AUTO_EXPAND_OBLONG']:
+                    if not self.params['auto_expand_oblong']:
                         self.spring_anchor_coords = (Vec2d.normalized(body.position - Vec2d(self.pattern_center)) * self.spring_circle_radius) + Vec2d(self.pattern_center) 
 
                     else: 
@@ -109,7 +104,7 @@ class Simulation(object):
                             stretch_radius = self.spring_circle_radius / 3
                         self.spring_anchor_coords = (Vec2d.normalized(body.position - Vec2d(self.pattern_center)) * stretch_radius) + Vec2d(self.pattern_center)
 
-                    ds = pm.DampedSpring(body, self.space.static_body, (0,0), self.spring_anchor_coords, 0, self.params['SPRING_STIFFNESS'], self.params['SPRING_DAMPING'])
+                    ds = pm.DampedSpring(body, self.space.static_body, (0,0), self.spring_anchor_coords, 0, self.params['spring_stiffness'], self.params['spring_damping'])
                     self.space.add(ds)
                     self.expansion_springs.append(ds)
                 else:
@@ -132,70 +127,70 @@ class Simulation(object):
             shape.color = color
         self.max_scr = 1
 
-    def draw_shapes(self):
-        if not self.params['VERTICES_ONLY']:
-            for i in range(len(self.center_shapes)):
-                center = self.center_shapes[i]
-                (node_x, node_y) = center.body.position
-                pygame.draw.polygon(self.screen, 
-                                    center.color, 
-                                    list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
-                                                        self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
-                                                                center.get_vertices())))
-                pygame.draw.polygon(self.screen, 
-                                    THECOLORS["lightskyblue2"], 
-                                    list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
-                                                        self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
-                                                                center.get_vertices())), 1)
+    # def draw_shapes(self):
+        # if not self.params['vertices_only']:
+        #     for i in range(len(self.center_shapes)):
+        #         center = self.center_shapes[i]
+        #         (node_x, node_y) = center.body.position
+        #         pygame.draw.polygon(self.screen, 
+        #                             center.color, 
+        #                             list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
+        #                                                 self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
+        #                                                         center.get_vertices())))
+        #         pygame.draw.polygon(self.screen, 
+        #                             THECOLORS["lightskyblue2"], 
+        #                             list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
+        #                                                 self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
+        #                                                         center.get_vertices())), 1)
 
-                font = pygame.font.Font(None, 16)
+        #         font = pygame.font.Font(None, 16)
 
-                # draw in current position (badly)
-                # self.screen.blit(font.render(str(i + 1), 1, THECOLORS["darkgrey"]), list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
-                #                                         self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
-                #                                                 center.get_vertices()))[0])
+        #         # draw in current position (badly)
+        #         # self.screen.blit(font.render(str(i + 1), 1, THECOLORS["darkgrey"]), list(map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
+        #         #                                         self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
+        #         #                                                 center.get_vertices()))[0])
 
-                # draw in initial position
-                # self.screen.blit(font.render(str(i + 1), 1, THECOLORS["darkgrey"]), [self.tile_centers[i][0], self.height - self.tile_centers[i][1]])
+        #         # draw in initial position
+        #         # self.screen.blit(font.render(str(i + 1), 1, THECOLORS["darkgrey"]), [self.tile_centers[i][0], self.height - self.tile_centers[i][1]])
 
 
-                if self.params["CALCULATE_AREA_PERIM"]:
-                    pygame.draw.polygon(self.screen, 
-                                        THECOLORS["lightskyblue3"], 
-                                        list(map(lambda x: self.to_pygame(x),
-                                        [self.vertex_bodies[(v[0])][(v[1])].position for v in self.hull_info])), 1)
+        #         if self.params["calculate_area_perim"]:
+        #             pygame.draw.polygon(self.screen, 
+        #                                 THECOLORS["lightskyblue3"], 
+        #                                 list(map(lambda x: self.to_pygame(x),
+        #                                 [self.vertex_bodies[(v[0])][(v[1])].position for v in self.hull_vertices])), 1)
 
-            for c in self.space.constraints:
-                if c in self.expansion_springs:
-                    if self.params["DISPLAY_EXPANSION_SPRINGS"]:
-                        pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
-                        pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
-                        p1 = self.to_pygame(pv1)
-                        p2 = self.to_pygame(pv2)
-                        pygame.draw.aalines(self.screen, THECOLORS["skyblue"], False, [p1,p2]) # remove this line to hide the springs
+        #     for c in self.space.constraints:
+        #         if c in self.expansion_springs:
+        #             if self.params["display_expansion_springs"]:
+        #                 pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
+        #                 pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
+        #                 p1 = self.to_pygame(pv1)
+        #                 p2 = self.to_pygame(pv2)
+        #                 pygame.draw.aalines(self.screen, THECOLORS["skyblue"], False, [p1,p2]) # remove this line to hide the springs
 
-                else:
-                    pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
-                    pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
-                    p1 = self.to_pygame(pv1)
-                    p2 = self.to_pygame(pv2)
-                    pygame.draw.aalines(self.screen, THECOLORS["skyblue"], False, [p1,p2])
+        #         else:
+        #             pv1 = c.a.position + (c.anchor_a).rotated(c.a.angle)
+        #             pv2 = c.b.position + (c.anchor_b).rotated(c.b.angle)
+        #             p1 = self.to_pygame(pv1)
+        #             p2 = self.to_pygame(pv2)
+        #             pygame.draw.aalines(self.screen, THECOLORS["skyblue"], False, [p1,p2])
                 
-            for s in self.static_pins:
-               pygame.draw.circle(self.screen, THECOLORS["royalblue1"], self.to_pygame(s.b.position), 5)
+        #     for s in self.static_pins:
+        #        pygame.draw.circle(self.screen, THECOLORS["royalblue1"], self.to_pygame(s.b.position), 5)
 
-        if self.params['VERTICES_ONLY']:
-            for center in self.center_shapes:
-                vertices = map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
-                                                            self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
-                                                                    center.get_vertices())
-                for pos in vertices:
-                    pygame.draw.circle(self.screen, THECOLORS["black"], pos, 1)
+        # if self.params['vertices_only']:
+        #     for center in self.center_shapes:
+        #         vertices = map(lambda x: ((x.rotated(center.body.angle) + center.body.position)[0], 
+        #                                                     self.height - (x.rotated(center.body.angle) + center.body.position)[1]),
+        #                                                             center.get_vertices())
+        #         for pos in vertices:
+        #             pygame.draw.circle(self.screen, THECOLORS["black"], pos, 1)
 
         
 
-    def to_pygame(self, p):
-        return int(p.x), int(self.height - p.y)
+    # def to_pygame(self, p):
+    #     return int(p.x), int(self.height - p.y)
 
-    def from_pygame(self, p): 
-        return self.to_pygame(p)
+    # def from_pygame(self, p): 
+    #     return self.to_pygame(p)
