@@ -16,9 +16,13 @@ A set of deployable quasicrystal patterns (a variety of 5-fold Penrose, 8-fold A
 
 Usage:
 
-Run "run_simulation.py" after setting the desired vertices, constraints, and hull files inside the .py files.
+Run "run_simulation.py" after setting the desired vertices, constraints, and hull files via command-line arguments. 
 
-File examples:
+Run example for Penrose pattern deployed using the expansion tile method:
+
+python run_simulation.py --vertices_file info_files/penrose110_vertices.txt --constraints_file info_files/penrose110_expansion_constraints.txt --hull_vertices_file info_files/penrose110_expansion_hull.txt --is_interactive true --calculate_area_perim true --auto_expand true
+
+More file pairing examples:
 
 Penrose expansion,  5-layer pattern
 * vertices_file: _penrose110_vertices.txt_, 
@@ -53,16 +57,17 @@ In the constraints file, order of rows doesn't matter and each row takes the for
 
 A pinjoint is made fixing the distance between vertex p of tile i and vertex q of tile j to be the same distance apart as they are in the contracted pattern state. For example, a row [1 3 2 1] would constrain Tile 1's third vertex and Tile 2's first vertex to be a fixed distance apart. If the two vertices were already in the same position, they will be "connected" and fixed to have the same position. Ideal expansion tiles were produced by constraining two vertices that were at opposite ends of an edge, which fixes the vertices to be one edge-length apart.
 
-The hull file specifies which vertices make up the outer hull of the pattern, in clockwise order. It is needed only for calculating the area and simulating deployment with radial springs pulling outward. Each row takes the form [Tile i | Vertex p] to denote that tile i's pth vertex is a point on the pattern's hull. 
+A hull vertices file specifies which vertices make up the outer hull of the pattern, in clockwise order. It is needed only for calculating the area and simulating deployment with radial springs pulling outward. Each row takes the form [Tile i | Vertex p] to denote that tile i's pth vertex is a point on the pattern's hull. The --hull_vertices_file and --hull_tiles_file arguments are different. Files with names ending in hull_tiles only include the tiles (not the specific vertices) of the hull, and need to be used with the --hull_tiles_file argument instead.
 
 ============================================================
 
 Additional notes:
-* DISPLAY_SIZE, X_OFFSET, Y_OFFSET, and VERTEX_MULTIPLIER can be used to adjust the scale and view of the expanding pattern; different patterns will be best viewed with different values for these.
-* When IS_INTERACTIVE is true, users can click and drag to interact with tiles, right click to pin tiles, press p to save a screenshot of the simulation, press r to reset the simulation, and press v or c to save a file with the current tile vertex/center locations.
-* To use the simulation without a hull file, set AUTO_EXPAND and CALCULATE_AREA_PERIM to false.
-* Use DISPLAY_EXPANSION_SPRINGS to toggle whether or not to display the springs used for automatic deployment.
-* Physical properties like friction, damping, spring strength, and so on can all be set via Pymunk. Pymunk's [documentation](http://www.pymunk.org/en/latest/pymunk.html) is a great resource for this.
+* All command-line arguments can be found in the parse_args function in utils.
+* The --display_size, --x_offset, --y_ofset, and --vertex_multiplier arguments can be used to adjust the scale and view of the expanding pattern; different patterns will be best viewed with different values for these.
+* When --is_interactive is true, users can click and drag to interact with tiles, right click to pin tiles, press p to save a screenshot of the simulation, press r to reset the simulation, and press v or c to save a file with the current tile vertex/center locations.
+* To use the simulation without a hull file, set --auto_expand and --calculate_area_perim to false.
+* Use --display_expansion_springs to toggle whether or not to display the springs used for automatic deployment.
+* Physical properties like friction, damping, spring strength, and so on can be set via Pymunk. Pymunk's [documentation](http://www.pymunk.org/en/latest/pymunk.html) is a great resource for this.
 * There are compatibility issues between certain versions of Python and Pygame. This may be a reason why the simulation is not working.
 * The animations above are produced using data from the simulation, plus additional processing to assign colors, etc.
 
