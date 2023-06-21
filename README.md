@@ -27,17 +27,17 @@ More file pairing examples:
 Penrose expansion,  5-layer pattern
 * vertices_file: _penrose110_vertices.txt_, 
 * constraints_file: _penrose110_expansion_constraints.txt_, 
-* hull_file: _penrose110_expansion_hull.txt_
+* hull_vertices_file: _penrose110_expansion_hull.txt_
 
 Penrose Hamiltonian, 5-layer pattern
 * vertices_file: _penrose110_vertices.txt_, 
 * constraints_file: _penrose110_hamiltonian_constraints.txt_, 
-* hull_file: _penrose110_hamiltonian_hull.txt_
+* hull_vertices_file: _penrose110_hamiltonian_hull.txt_
 
 Penrose removal, 5-layer pattern
 * vertices_file: _penrose110_nothinrhombs_vertices.txt_, 
 * constraints_file: _penrose110_nothinrhombs_constraints1.txt_, 
-* hull_file: _penrose110_nothinrhombs_hull1.txt_
+* hull_vertices_file: _penrose110_nothinrhombs_hull1.txt_
 
 ============================================================
 
